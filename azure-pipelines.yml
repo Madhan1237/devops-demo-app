@@ -9,13 +9,43 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
-steps:
-- script: |
-    echo "CI pipeline running"
-    ls
-  displayName: 'Check code'
+variables:
+  IMAGE_NAME: devops-demo-app
+  DOCKER_USER: $(DOCKER_USERNAME)
 
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(Build.SourcesDirectory)'
-    ArtifactName: website
+steps:
+- checkout: self
+
+# 1️⃣ Get Git commit ID
+- script: |
+    echo "##vso[task.setvariable variable=IMAGE_TAG]$(git rev-parse --short HEAD)"
+  displayName: 'Set Image Tag'
+
+# 2️⃣ Docker Login
+- script: |
+    echo $(DOCKER_PASSWORD) | docker login -u $(DOCKER_USER) --password-stdin
+  displayName: 'Docker Login'
+
+# 3️⃣ Build Docker Image
+- script: |
+    docker build -t $(DOCKER_USER)/$(IMAGE_NAME):$(IMAGE_TAG) .
+  displayName: 'Build Docker Image'
+
+# 4️⃣ Push Docker Image
+- script: |
+    docker push $(DOCKER_USER)/$(IMAGE_NAME):$(IMAGE_TAG)
+  displayName: 'Push Docker Image'
+
+# 5️⃣ Install kubectl
+- script: |
+    curl -LO https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl
+    chmod +x kubectl
+    sudo mv kubectl /usr/local/bin/
+  displayName: 'Install kubectl'
+
+# 6️⃣ Deploy to Kubernetes
+- script: |
+    sed -i 's/IMAGE_TAG/$(IMAGE_TAG)/g' deployment.yaml
+    kubectl apply -f deployment.yaml
+    kubectl rollout status deployment/devops-demo-deployment
+  displayName: 'Deploy to Kubernetes'
