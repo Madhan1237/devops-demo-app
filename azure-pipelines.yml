@@ -44,9 +44,9 @@ steps:
   displayName: 'Install kubectl'
 
 # 6️⃣ Deploy to Kubernetes
-- script: |
-    sed -i "s|IMAGE_TAG|$(IMAGE_TAG)|g" k8s/deployment.yaml
-    kubectl apply -f k8s/deployment.yaml
-    kubectl apply -f k8s/service.yaml
-    kubectl rollout status deployment/devops-demo-deployment
-  displayName: 'Deploy to Kubernetes'
+#- script: |
+#   sed -i "s|IMAGE_TAG|$(IMAGE_TAG)|g" k8s/deployment.yaml
+#    kubectl apply -f k8s/deployment.yaml
+#    kubectl apply -f k8s/service.yaml
+#    kubectl rollout status deployment/devops-demo-deployment
+#  displayName: 'Deploy to Kubernetes'
