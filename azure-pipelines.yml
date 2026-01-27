@@ -43,7 +43,13 @@ steps:
     sudo mv kubectl /usr/local/bin/
   displayName: 'Install kubectl'
 
-# 6️⃣ Deploy to Kubernetes
+# 6️⃣ Show Image Info
+- script: |
+    echo "Docker Image pushed:"
+    echo "$(DOCKER_USER)/$(IMAGE_NAME):$(IMAGE_TAG)"
+  displayName: 'Show Image Info'
+
+#  Deploy to Kubernetes
 #- script: |
 #   sed -i "s|IMAGE_TAG|$(IMAGE_TAG)|g" k8s/deployment.yaml
 #    kubectl apply -f k8s/deployment.yaml
